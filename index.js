@@ -9,6 +9,7 @@ app.all('/', (req, res) => {
 			'X-Shopify-Access-Token': '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',
 		}
 	})
+        .then(response => response.json())
         .then(data => res.send(data))
         .catch(err => console.log(err));
 })
