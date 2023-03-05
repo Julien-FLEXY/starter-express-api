@@ -7,8 +7,17 @@ const apiEndpoint = `/admin/api/2023-01/variants/${productVariantId}.json`;
 
 const app = express();
 
+app.use(function (req, res, next) {
+    console.log(req.ip);
+    if (req.ip !== '::1') { // Wrong IP address
+        res.status(401);
+        return res.send('Permission denied');
+    }
+    next(); // correct IP address, continue middleware chain
+});
+
 // Update product variant price
-app.all('/', (req, res) => {
+app.get('/', (req, res) => {
     fetch(baseURL + apiEndpoint, {
         method: 'GET',
         headers: {
