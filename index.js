@@ -9,7 +9,7 @@ const app = express();
 
 app.use(function (req, res, next) {
     console.log(req.ip);
-    if (req.ip !== '::1') { // Wrong IP address
+    if (req.ip !== '127.0.0.1') { // Wrong IP address
         res.status(401);
         return res.send('Permission denied');
     }
