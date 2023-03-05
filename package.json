@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/cyclic-software/starter-express-api#readme",
   "dependencies": {
+    "@shopify/shopify-api": "^6.2.0",
     "express": "^4.17.1"
   }
 }
