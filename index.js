@@ -33,7 +33,6 @@ app.use(function (req, res, next) {
 // });
 
 app.get('/', (req, res) => {
-    console.log(apiKey);
     fetch(baseURL + apiEndpointPrice, {
         method: 'GET',
         headers: {
