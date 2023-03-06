@@ -2,8 +2,11 @@ import express from 'express';
 
 const shop = "julien-test-site";
 const baseURL = `https://${shop}.myshopify.com/`;
-const productVariantId = "39763716341825";
-const apiEndpoint = `/admin/api/2023-01/variants/${productVariantId}.json`;
+const productVariantId = "40389394071617";
+const locationId = "61714694209";
+const apiEndpointPrice = `/admin/api/2023-01/variants/${productVariantId}.json`;
+const apiEndpointInventory = `/admin/api/2023-01/inventory_levels/adjust.json`;
+// const apiEndpointLocation = `/admin/api/2023-01/locations.json`;
 
 const app = express();
 
@@ -15,8 +18,21 @@ app.use(function (req, res, next) {
     next();
 });
 
+// app.use(function (req, res, next) {
+//     fetch(baseURL + apiEndpointLocation, {
+//         method: 'GET',
+//         headers: {
+//             'X-Shopify-Access-Token': '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',
+//         }
+//     })
+//         .then(response => response.json())
+//         .then(data => console.log(data))
+//         .catch(err => console.log(err))
+//     next();
+// });
+
 app.get('/', (req, res) => {
-    fetch(baseURL + apiEndpoint, {
+    fetch(baseURL + apiEndpointPrice, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -26,7 +42,9 @@ app.get('/', (req, res) => {
         .then(response => response.json())
         .then(data =>  {
             if (data.variant) {
-                const price = (parseInt(data.variant.price) + 1) + ".00";
+                const priceData = parseInt(data.variant.price) + 1;                
+                const price = priceData + ".00";
+
                 const requestOptions = {
                     method: 'PUT',
                     headers: {
@@ -36,9 +54,40 @@ app.get('/', (req, res) => {
                     body: `{"variant":{"price":${price}}}`
                 };
 
-                fetch(baseURL + apiEndpoint, requestOptions)
+                fetch(baseURL + apiEndpointPrice, requestOptions)
                     .then(response => response.json())
-                    .then(data => res.send(data));
+                    .then(data => {
+                        const priceData = parseInt(data.variant.price);
+                        const inventoryData = data.variant.inventory_quantity;
+                        let inventory;
+
+                        if (priceData <= 15 && inventoryData != 5) {
+                            inventory = 5 - inventoryData;
+                        } else if (priceData > 15 && priceData <= 30 && inventoryData != 20) {
+                            inventory = 20 - inventoryData;
+                        } else if (priceData > 30) {
+                            inventory = 9999 - inventoryData;
+                        } else {
+                            inventory = 0;
+                        }
+
+                        const requestOptions = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Shopify-Access-Token': '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',
+                            },
+                            body: `{"location_id":${locationId},"inventory_item_id":${data.variant.inventory_item_id},"available_adjustment":${inventory}}`
+                        };
+
+                        fetch(baseURL + apiEndpointInventory, requestOptions)
+                            .then(response => response.json())
+                            .then(data => {
+                                res.send(`<h1>Data updated</h1>`)
+                            })
+                            .catch(err => console.log(err))
+                    })
+                    .catch(err => console.log(err))
             } else {
                 res.send("<p>No data</p>");
             }
