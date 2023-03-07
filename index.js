@@ -1,9 +1,9 @@
 import express from 'express';
 
-const shop = "julien-test-site";
+const shop = "inflation-candle";
 const baseURL = `https://${shop}.myshopify.com/`;
-const productVariantId = "40389394071617";
-const locationId = "61714694209";
+const productVariantId = "44726745891128";
+const locationId = "80134930744";
 const apiEndpointPrice = `/admin/api/2023-01/variants/${productVariantId}.json`;
 const apiEndpointInventory = `/admin/api/2023-01/inventory_levels/adjust.json`;
 const apiKey = process.env.SHOPIFY_KEY;
@@ -23,7 +23,7 @@ app.use(function (req, res, next) {
 //     fetch(baseURL + apiEndpointLocation, {
 //         method: 'GET',
 //         headers: {
-//             'X-Shopify-Access-Token': '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',
+//             'X-Shopify-Access-Token': `${apiKey}`,
 //         }
 //     })
 //         .then(response => response.json())
